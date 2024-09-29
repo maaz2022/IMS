@@ -1,6 +1,4 @@
-## 🚨 Tutorial
 
-This repository contains the corresponding tutorial available on our YouTube channel, <a href="https://www.youtube.com/@CodeScrapperOfficial/videos" target="_blank"><b>Code Scrapper</b></a>.
 
 ## <a name="introduction">🤖 Introduction</a>
 
