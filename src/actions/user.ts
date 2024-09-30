@@ -93,24 +93,24 @@ export const updateUser = async (id: string, userId: string, isAdmin: boolean, s
 
 
 
-// Function to dynamically update the order status
-export const updateOrderStatus = async (orderId: string, newStatus: string) => {
-  try {
-    const updatedOrder = await db.trackOrder.update({
-      where: { id: orderId },
-      data: { status: newStatus }, // Update the status field
-    });
+// // Function to dynamically update the order status
+// export const updateOrderStatus = async (orderId: string, newStatus: string) => {
+//   try {
+//     const updatedOrder = await db.trackOrder.update({
+//       where: { id: orderId },
+//       data: { status: newStatus }, // Update the status field
+//     });
 
-    if (!updatedOrder) {
-      return { error: "Failed to update order status" };
-    }
+//     if (!updatedOrder) {
+//       return { error: "Failed to update order status" };
+//     }
 
-    return { success: true, updatedOrder };
-  } catch (error) {
-    console.error("Error updating order status:", error);
-    return { error: "Failed to update order status" };
-  }
-};
+//     return { success: true, updatedOrder };
+//   } catch (error) {
+//     console.error("Error updating order status:", error);
+//     return { error: "Failed to update order status" };
+//   }
+// };
 
 
 
@@ -253,8 +253,20 @@ export const DeleteUser = async (id: string) => {
     return { error: "user not deleted" };
   }
 };
-// Function to send an order
 
+export const DeleteTrackOrder = async (id: string) => {
+  try {
+    const result = await db.trackOrder.delete({
+      where: { id },
+    });
+    revalidatePath("/dashboard");
+    if (!result) {
+      return { error: "track order not deleted" };
+    }
+  } catch (error) {
+    return { error: "track order not deleted" };
+  }
+};
 
 
 

@@ -7,7 +7,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, Search } from "lucide-react";
+import { ArrowUpDown, ChevronDown, Search, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -25,9 +25,9 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { updateUser } from "@/actions/user";
+import { DeleteTrackOrder, updateUser } from "@/actions/user"; // Make sure this is correctly implemented.
+import { TrackOrderDelete } from "./TrackOrderDelete"; // Ensure this is imported correctly
 
-// Define the Order interface
 interface Order {
   id: string; // Unique identifier
   itemName: string;
@@ -92,7 +92,21 @@ export const columns: ColumnDef<Order>[] = [
       <div className="lowercase line-clamp-2">{row.getValue("orderCost")}</div>
     ),
   },
+  {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => <DeleteButton row={row} />, // Use DeleteButton here
+    enableSorting: false,
+  },
 ];
+
+const DeleteButton = ({ row }: { row: any }) => {
+  const orderId = row.getValue("id");
+
+  return (
+    <TrackOrderDelete data={row.original} /> // Pass the order ID to TrackOrderDelete
+  );
+};
 
 const StatusDropdown = ({ row }: { row: any }) => {
   const [status, setStatus] = React.useState(row.getValue("status"));
@@ -100,7 +114,6 @@ const StatusDropdown = ({ row }: { row: any }) => {
   const handleChange = async (newStatus: string) => {
     setStatus(newStatus); // Optimistic UI update
 
-    // Call the backend to update the order's status
     const response = await updateUser(row.getValue("id"), row.getValue("userId"), true /*isAdmin*/, newStatus);
     
     if (response.error) {
@@ -110,7 +123,7 @@ const StatusDropdown = ({ row }: { row: any }) => {
   };
 
   return (
- <DropdownMenu>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="ml-auto">
           {status} <ChevronDown className="ml-2 h-4 w-4" />
@@ -134,7 +147,6 @@ const StatusDropdown = ({ row }: { row: any }) => {
 
 // Main OrderTracking component
 const OrderTracking = ({ data = [] }: { data: Order[] }) => {
-  // Create the table instance
   const table = useReactTable({
     data,
     columns,
@@ -229,24 +241,4 @@ const OrderTracking = ({ data = [] }: { data: Order[] }) => {
   );
 };
 
-// Simulating the updateUser function from your backend
-const updateOrderStatus = async (id: string, newStatus: string) => {
-  try {
-    const response = await fetch('/api/updateOrder', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ id, status: newStatus }),
-    });
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error updating order status:', error);
-    return { error: 'Failed to update order status' };
-  }
-};
-
 export default OrderTracking;
-
-// Action to update user status

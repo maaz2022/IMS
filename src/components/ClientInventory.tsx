@@ -35,21 +35,21 @@ export type Payment = {
   description: string; // Assuming you want to include description
   cost: number; // Assuming you want to include cost
 };
-  const handleStatusChange = async (id: string, status: string) => {
-    try {
-      const response = await fetch('/api/updateOrderStatus', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id, status }),
-      });
+  // const handleStatusChange = async (id: string, status: string) => {
+  //   try {
+  //     const response = await fetch('/api/updateOrderStatus', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ id, status }),
+  //     });
 
-      if (!response.ok) throw new Error('Failed to update status');
-    } catch (error) {
-      console.error('Error updating status:', error);
-    }
-  };
+  //     if (!response.ok) throw new Error('Failed to update status');
+  //   } catch (error) {
+  //     console.error('Error updating status:', error);
+  //   }
+  // };
 // Update columns to reflect the new status
 export const columns: ColumnDef<Payment>[] = [
   {
