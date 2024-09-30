@@ -41,44 +41,75 @@ export const loginSignup = async (formData: FormData, isLogin: boolean) => {
 
 // update user
 
-export const updateUser = async (id: string, userId: string, isAdmin: boolean) => {
+export const updateUser = async (id: string, userId: string, isAdmin: boolean, status: string) => {
   let inventory;
-  let trackOrder = null; // Initialize trackOrder as null
+  let trackOrder = null;
+
   try {
-    // Update the inventory
+    // Update inventory to assign the new userId
     inventory = await db.inventory.update({
       where: { id },
-      data: { userId },
+      data: { userId }, // Transfer item ownership by updating userId
     });
 
     if (!inventory) {
-      return { error: "failed to transfer" };
+      return { error: "failed to transfer inventory" };
     }
 
-    // Create a new entry in the TrackOrder table
-    trackOrder = await db.trackOrder.create({
+    // Update the status and other order details in TrackOrder
+    trackOrder = await db.trackOrder.update({
+      where: { id },
       data: {
-        status: "Pending", // Default status
-        orderCost: inventory.cost, // Assuming the cost is part of the inventory
-        itemName: inventory.name, // Get the item name from inventory
-        userName: inventory.userId 
-          ? (await db.user.findUnique({ where: { id: inventory.userId } }))?.name || "" // Optional chaining to handle null
-          : "", // Default to empty string if userId is null
-        userId: userId, // Associate with the user transferring the data
+        status, // Dynamic status provided by the user
+        orderCost: inventory.cost, // Set order cost from inventory
+        itemName: inventory.name, // Set item name from inventory
+        userName: inventory.userId
+          ? (await db.user.findUnique({ where: { id: inventory.userId } }))?.name || ""
+          : "", // Set the user's name if available
+        userId, // Set the userId as the current user transferring
       },
     });
 
     if (!trackOrder) {
-      return { error: "failed to create track order" };
+      return { error: "failed to update track order" };
     }
+
+    // Optionally revalidate the frontend view based on user's role (Admin or User)
+    revalidatePath(isAdmin ? "/dashboard" : "/");
+
   } catch (error) {
-    console.error(error); // Log the error for debugging purposes
-    return { error: "failed to transfer" };
+    console.error("Error updating order:", error);
+    return { error: "failed to update the user and inventory" };
   }
 
-  // Revalidate the path based on user type
-  revalidatePath(`${isAdmin ? "/dashboard" : "/"}`);
-  return { inventory, trackOrder }; // Return both inventory and track order objects
+  return { inventory, trackOrder };
+};
+
+
+
+// /pages/api/updateOrder.ts
+
+
+
+
+
+// Function to dynamically update the order status
+export const updateOrderStatus = async (orderId: string, newStatus: string) => {
+  try {
+    const updatedOrder = await db.trackOrder.update({
+      where: { id: orderId },
+      data: { status: newStatus }, // Update the status field
+    });
+
+    if (!updatedOrder) {
+      return { error: "Failed to update order status" };
+    }
+
+    return { success: true, updatedOrder };
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    return { error: "Failed to update order status" };
+  }
 };
 
 

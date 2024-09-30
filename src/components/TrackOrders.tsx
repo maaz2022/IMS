@@ -18,21 +18,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem, 
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { updateUser } from "@/actions/user";
 
 // Define the Order interface
 interface Order {
+  id: string; // Unique identifier
   itemName: string;
   name: string; // Changed from deliveredTo to name
   status: string;
-  orderCost: number;   // New field added
+  orderCost: number; // New field added
 }
 
 // Define the columns for the table
@@ -68,7 +69,9 @@ export const columns: ColumnDef<Order>[] = [
         Item Name <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => <div className="capitalize">{row.getValue("itemName")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("itemName")}</div>
+    ),
   },
   {
     accessorKey: "name", // Changed accessorKey to name
@@ -80,9 +83,7 @@ export const columns: ColumnDef<Order>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => (
-      <div className="lowercase line-clamp-2">{row.getValue("status")}</div>
-    ),
+    cell: ({ row }) => <StatusDropdown row={row} />,
   },
   {
     accessorKey: "orderCost",
@@ -92,6 +93,44 @@ export const columns: ColumnDef<Order>[] = [
     ),
   },
 ];
+
+const StatusDropdown = ({ row }: { row: any }) => {
+  const [status, setStatus] = React.useState(row.getValue("status"));
+
+  const handleChange = async (newStatus: string) => {
+    setStatus(newStatus); // Optimistic UI update
+
+    // Call the backend to update the order's status
+    const response = await updateUser(row.getValue("id"), row.getValue("userId"), true /*isAdmin*/, newStatus);
+    
+    if (response.error) {
+      console.error("Error updating status:", response.error);
+      setStatus(row.getValue("status")); // Rollback UI if the update fails
+    }
+  };
+
+  return (
+ <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="ml-auto">
+          {status} <ChevronDown className="ml-2 h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {["Pending", "Processing", "Completed", "Canceled"].map((stat) => (
+          <DropdownMenuCheckboxItem
+            key={stat}
+            className="capitalize"
+            checked={status === stat}
+            onCheckedChange={() => handleChange(stat)}
+          >
+            {stat}
+          </DropdownMenuCheckboxItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 
 // Main OrderTracking component
 const OrderTracking = ({ data = [] }: { data: Order[] }) => {
@@ -124,16 +163,21 @@ const OrderTracking = ({ data = [] }: { data: Order[] }) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {table.getAllColumns().filter((column) => column.getCanHide()).map((column) => (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                ))}
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  ))}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -147,7 +191,10 @@ const OrderTracking = ({ data = [] }: { data: Order[] }) => {
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <TableHead key={header.id}>
-                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -159,7 +206,10 @@ const OrderTracking = ({ data = [] }: { data: Order[] }) => {
                   <TableRow key={row.id}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -179,4 +229,24 @@ const OrderTracking = ({ data = [] }: { data: Order[] }) => {
   );
 };
 
+// Simulating the updateUser function from your backend
+const updateOrderStatus = async (id: string, newStatus: string) => {
+  try {
+    const response = await fetch('/api/updateOrder', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id, status: newStatus }),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    return { error: 'Failed to update order status' };
+  }
+};
+
 export default OrderTracking;
+
+// Action to update user status

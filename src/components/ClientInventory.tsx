@@ -24,15 +24,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import AssignInventoryActions from "./AssignInventoryActions";
 
+// Updated Payment type
 export type Payment = {
   id: string;
   amount: number;
   status: "pending" | "processing" | "success" | "failed";
   email: string;
+  name: string; // Assuming you want to include name
+  description: string; // Assuming you want to include description
+  cost: number; // Assuming you want to include cost
 };
+  const handleStatusChange = async (id: string, status: string) => {
+    try {
+      const response = await fetch('/api/updateOrderStatus', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id, status }),
+      });
 
+      if (!response.ok) throw new Error('Failed to update status');
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
+  };
+// Update columns to reflect the new status
 export const columns: ColumnDef<Payment>[] = [
   {
     id: "select",
@@ -70,7 +88,6 @@ export const columns: ColumnDef<Payment>[] = [
     },
     cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
-
   {
     accessorKey: "description",
     header: "Description",
@@ -87,30 +104,51 @@ export const columns: ColumnDef<Payment>[] = [
     header: () => <div className="text-right">Cost</div>,
     cell: ({ row }) => {
       const cost = parseFloat(row.getValue("cost"));
-
-      // Format the cost as a dollar cost
       const formatted = new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",
       }).format(cost);
-
       return <div className="text-right font-medium">{formatted}</div>;
     },
   },
   {
-    id: "actions",
-    header: "Transfer Inventory",
-    cell: ({ row }) => <AssignInventoryActions row={row} />,
+    id: "status",
+    header: "Order Status",
+    cell: ({ row }) => {
+      const [status, setStatus] = React.useState<Payment["status"]>(row.getValue("status")); // Initialize status with current value
+      const statusColor: Record<Payment["status"], string> = { // Define a mapping for status colors
+        pending: "text-yellow-500",
+        processing: "text-blue-500",
+        success: "text-green-500",
+        failed: "text-red-500",
+      };
+
+      return (
+        <div>
+          <select
+            value={status}
+            onChange={(e) => {
+              const newStatus = e.target.value as Payment["status"];
+              setStatus(newStatus);
+              row.original.status = newStatus; // Update the status in the row's original data
+            }}
+            className={`border rounded p-1 ${statusColor[status]}`}
+          >
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="success">Success</option>
+            <option value="failed">Failed</option>
+          </select>
+        </div>
+      );
+    },
   },
 ];
 
 const ClientInventory = ({ user }: any) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
