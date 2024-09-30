@@ -21,4 +21,16 @@ export type InventoryDataProps = {
   lifeSpan: number;
   createdAt: Date;
   updatedAt: Date | null;
+  asPerPlan: number;      
+  existing: number;       
+  required: number;       
+  proInStore: number;     
+  itemsShort: number;  
 }[];
+interface Order {
+  itemName: string;
+  deliveredTo: string;
+  status: string;
+  destination: string; // New field added
+  orderCost: number;   // New field added
+}

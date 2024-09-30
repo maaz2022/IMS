@@ -48,6 +48,7 @@ import { signOut } from "next-auth/react";
 import InventoryData from "./InventoryData";
 import InventoryUpdate from "./InventoryUpdate";
 
+// Define your columns including new fields (asPerPlan, existing, required, proInStore, itemsShort)
 export const columns: ColumnDef<InventoryDataProps>[] = [
   {
     id: "select",
@@ -110,6 +111,40 @@ export const columns: ColumnDef<InventoryDataProps>[] = [
     },
   },
   {
+    accessorKey: "asPerPlan",
+    header: "As Per Plan",
+    cell: ({ row }) => row.getValue("asPerPlan"),
+  },
+  {
+    accessorKey: "existing",
+    header: "Existing",
+    cell: ({ row }) => row.getValue("existing"),
+  },
+  {
+    accessorKey: "required",
+    header: "Required",
+    cell: ({ row }) => row.getValue("required"),
+  },
+  {
+    accessorKey: "proInStore",
+    header: "Pro/In Store",
+    cell: ({ row }) => row.getValue("proInStore"),
+  },
+{
+  id: "itemsShort",
+  header: "Items Short",
+  cell: ({ row }) => {
+    // Ensure the values are numbers by casting them
+    const asPerPlan = Number(row.getValue("asPerPlan"));
+    const proInStore = Number(row.getValue("proInStore"));
+
+    // Safeguard in case the values are NaN (e.g., if they aren't valid numbers)
+    const itemsShort = !isNaN(asPerPlan) && !isNaN(proInStore) ? asPerPlan - proInStore : "Invalid data";
+
+    return itemsShort;
+  },
+  },
+  {
     accessorKey: "assignAction",
     header: "Transaction Status",
     cell: ({ row }) => {
@@ -124,14 +159,14 @@ export const columns: ColumnDef<InventoryDataProps>[] = [
         if (res?.error) {
           toast({ title: res?.error });
         } else {
-          toast({ title: "Inventory successfully transfered" });
+          toast({ title: "Inventory successfully transferred" });
         }
       };
       return (
         <Select onValueChange={handleChange}>
           <SelectTrigger className="w-full">
             <SelectValue
-              placeholder={client ? client?.name : "Select an client"}
+              placeholder={client ? client?.name : "Select a client"}
             />
           </SelectTrigger>
           <SelectContent>
@@ -182,6 +217,7 @@ const DashboardDataTable = ({ data }: any) => {
       rowSelection,
     },
   });
+
   return (
     <div>
       <div className="flex justify-between w-full h-14 lg:h-16 items-center gap-4 border-b bg-gray-100/40 px-6">
@@ -290,30 +326,24 @@ const DashboardDataTable = ({ data }: any) => {
               </TableBody>
             </Table>
           </div>
-          <div className="flex items-center justify-end space-x-2 py-4">
-            <div className="flex-1 text-sm text-muted-foreground">
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
-            </div>
-            <div className="space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                Next
-              </Button>
-            </div>
-          </div>
+        </div>
+        <div className="flex items-center justify-end space-x-2 py-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
         </div>
       </div>
     </div>

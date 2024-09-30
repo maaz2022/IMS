@@ -22,13 +22,22 @@ import {
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
+  DropdownMenuCheckboxItem, 
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+// Define the Order interface
+interface Order {
+  itemName: string;
+  deliveredTo: string;
+  status: string;
+  destination: string; // New field added
+  orderCost: number;   // New field added
+}
+
 // Define the columns for the table
-export const columns: ColumnDef<{ itemName: string; deliveredTo: string; status: string }>[] = [
+export const columns: ColumnDef<Order>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -76,10 +85,24 @@ export const columns: ColumnDef<{ itemName: string; deliveredTo: string; status:
       <div className="lowercase line-clamp-2">{row.getValue("status")}</div>
     ),
   },
+  {
+    accessorKey: "destination",
+    header: "Destination",
+    cell: ({ row }) => (
+      <div className="lowercase line-clamp-2">{row.getValue("destination")}</div>
+    ),
+  },
+  {
+    accessorKey: "orderCost",
+    header: "Order Cost",
+    cell: ({ row }) => (
+      <div className="lowercase line-clamp-2">{row.getValue("orderCost")}</div>
+    ),
+  },
 ];
 
 // Main OrderTracking component
-const OrderTracking = ({ data = [] }: { data: { itemName: string; deliveredTo: string; status: string }[] }) => {
+const OrderTracking = ({ data = [] }: { data: Order[] }) => {
   // Create the table instance
   const table = useReactTable({
     data,

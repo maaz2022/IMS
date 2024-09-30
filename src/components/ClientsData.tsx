@@ -35,6 +35,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Input } from "./ui/input";
 import { signOut } from "next-auth/react";
+import { UserDelete } from "./UserDelete";
 
 export const columns: ColumnDef<InventoryDataProps>[] = [
   {
@@ -94,8 +95,13 @@ export const columns: ColumnDef<InventoryDataProps>[] = [
   },
   {
     id: "actions",
-    header: "Transfer Inventory",
+    header: "User Details",
     cell: ({ row }) => <ClientActions row={row} />,
+  },
+    {
+    id: "delete", // Unique column id
+    header: "Delete User", // Column header
+    cell: ({ row }) => <UserDelete data={row.original} />, // Use the UserDelete component
   },
 ];
 

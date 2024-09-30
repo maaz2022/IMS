@@ -20,15 +20,17 @@ type Props = {
   title: string;
   data: any;
 };
+
 const InventoryData = ({ title, data }: Props) => {
   const handleSubmit = async (formData: FormData) => {
     const response: any = await addUpdateInventory(formData, data);
     if (response?.error) {
       toast({ title: response?.error });
     } else {
-      toast({ title: "inventory created successfully" });
+      toast({ title: "Inventory created successfully" });
     }
   };
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -63,6 +65,35 @@ const InventoryData = ({ title, data }: Props) => {
                   name="cost"
                   label="Enter Inventory Cost"
                   defaultValue={data?.cost}
+                />
+                {/* New Fields */}
+                <FormInput
+                  type="number"
+                  name="asPerPlan"
+                  label="As Per Plan"
+                  placeholder="Enter as per plan value"
+                  defaultValue={data?.asPerPlan}
+                />
+                <FormInput
+                  type="number"
+                  name="existing"
+                  label="Existing"
+                  placeholder="Enter existing value"
+                  defaultValue={data?.existing}
+                />
+                <FormInput
+                  type="number"
+                  name="required"
+                  label="Required"
+                  placeholder="Enter required value"
+                  defaultValue={data?.required}
+                />
+                <FormInput
+                  type="number"
+                  name="proInStore"
+                  label="Pro/In Store"
+                  placeholder="Enter Pro/In Store value"
+                  defaultValue={data?.proInStore}
                 />
               </div>
             </div>

@@ -22,8 +22,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { updateUserRole } from "@/actions/user";
+import { DeleteUser, updateUserRole } from "@/actions/user";
 import { toast } from "./ui/use-toast";
+import { UserDelete } from "./UserDelete";
 
 const ClientActions = ({ row }: any) => {
   const data = row.original;

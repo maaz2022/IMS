@@ -40,11 +40,8 @@ export const loginSignup = async (formData: FormData, isLogin: boolean) => {
 };
 
 // update user
-export const updateUser = async (
-  id: string,
-  userId: string,
-  isAdmin: boolean
-) => {
+
+export const updateUser = async (id: string, userId: string, isAdmin: boolean) => {
   let inventory;
   try {
     inventory = await db.inventory.update({
@@ -107,26 +104,60 @@ export const addUpdateInventory = async (formData: FormData, data: any) => {
   const getCost = formData.get("cost") as string;
   const cost = Number(getCost);
 
+  // New fields from formData
+  const getAsPerPlan = formData.get("asPerPlan") as string;
+  const getExisting = formData.get("existing") as string;
+  const getRequired = formData.get("required") as string;
+  const getProInStore = formData.get("proInStore") as string;
+
+  // Convert new fields to numbers
+  const asPerPlan = Number(getAsPerPlan);
+  const existing = Number(getExisting);
+  const required = Number(getRequired);
+  const proInStore = Number(getProInStore);
+
   const user = await db.user.findUnique({
     where: { email: session?.user?.email! },
   });
 
-  if (!name || !description || !cost) {
+  // Validate that all required fields are present
+  if (!name || !description || !cost ) {
     return { error: "All fields are required" };
   }
 
   let inventory;
   try {
     if (data?.id) {
+      // Update existing inventory
       inventory = await db.inventory.update({
         where: { id: data?.id },
-        data: { name, description, cost, userId: user?.id },
+        data: {
+          name,
+          description,
+          cost,
+          asPerPlan,
+          existing,
+          required,
+          proInStore,
+          userId: user?.id,
+        },
       });
     } else {
+      // Create new inventory
       inventory = await db.inventory.create({
-        data: { name, description, cost, userId: user?.id },
+        data: {
+          name,
+          description,
+          cost,
+          asPerPlan,
+          existing,
+          required,
+          proInStore,
+          userId: user?.id,
+        },
       });
     }
+
     if (!inventory) {
       return { error: "failed to create inventory" };
     }
@@ -137,6 +168,7 @@ export const addUpdateInventory = async (formData: FormData, data: any) => {
   revalidatePath(`/dashboard`);
   return inventory;
 };
+
 
 // delete inventory
 
@@ -153,3 +185,22 @@ export const DeleteInventory = async (id: string) => {
     return { error: "inventory not deleted" };
   }
 };
+
+export const DeleteUser = async (id: string) => {
+  try {
+    const result = await db.user.delete({
+      where: { id },
+    });
+    revalidatePath("/dashboard");
+    if (!result) {
+      return { error: "user not deleted" };
+    }
+  } catch (error) {
+    return { error: "user not deleted" };
+  }
+};
+// Function to send an order
+
+
+
+
