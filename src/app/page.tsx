@@ -4,6 +4,7 @@ import { auth } from "../../auth";
 import { db } from "@/lib/db";
 import ClientComp from "@/components/ClientComp";
 import { redirect } from "next/navigation";
+import React from "react";
 
 export default async function Home() {
   const session = await auth();

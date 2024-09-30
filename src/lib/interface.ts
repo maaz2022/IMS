@@ -33,4 +33,6 @@ interface Order {
   status: string;
   destination: string; // New field added
   orderCost: number;   // New field added
+    createdAt: Date;
+  updatedAt: Date | null;
 }
