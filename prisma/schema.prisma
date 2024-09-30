@@ -34,3 +34,7 @@ model Inventory {
   createdAt   DateTime @default(now())
   updatedAr   DateTime @updatedAt
 }
+
+model TrackOrder {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}

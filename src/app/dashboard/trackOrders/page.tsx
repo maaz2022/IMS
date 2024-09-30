@@ -30,9 +30,8 @@ import {
 // Define the Order interface
 interface Order {
   itemName: string;
-  deliveredTo: string;
+  name: string; // Changed from deliveredTo to name
   status: string;
-  destination: string; // New field added
   orderCost: number;   // New field added
 }
 
@@ -72,10 +71,10 @@ export const columns: ColumnDef<Order>[] = [
     cell: ({ row }) => <div className="capitalize">{row.getValue("itemName")}</div>,
   },
   {
-    accessorKey: "deliveredTo",
-    header: "Delivered To",
+    accessorKey: "name", // Changed accessorKey to name
+    header: "Name", // Changed header to Name
     cell: ({ row }) => (
-      <div className="lowercase line-clamp-2">{row.getValue("deliveredTo")}</div>
+      <div className="lowercase line-clamp-2">{row.getValue("name")}</div>
     ),
   },
   {
@@ -83,13 +82,6 @@ export const columns: ColumnDef<Order>[] = [
     header: "Status",
     cell: ({ row }) => (
       <div className="lowercase line-clamp-2">{row.getValue("status")}</div>
-    ),
-  },
-  {
-    accessorKey: "destination",
-    header: "Destination",
-    cell: ({ row }) => (
-      <div className="lowercase line-clamp-2">{row.getValue("destination")}</div>
     ),
   },
   {
