@@ -8,9 +8,16 @@ const Dashboard = async () => {
     db.user.findMany(),
   ]);
 
-  const response = inventoryData?.map((inv) => {
-    return { ...inv, clients };
-  });
+  // Log fetched data for debugging
+  console.log("Inventory Data:", {inventoryData});
+  console.log("Clients:", {clients});
+
+  // Assuming each inventory item has an image field, combine data correctly
+  const response = inventoryData.map((inv) => ({
+    ...inv,
+    clients: clients.map(client => ({ id: client.id, name: client.name })), // Map clients correctly
+  }));
+
   return <DashboardDataTable data={response} />;
 };
 

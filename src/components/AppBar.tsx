@@ -9,7 +9,7 @@ const AppBar = async () => {
       {session && session?.user ? (
         <h2>Welcome {session?.user?.name}</h2>
       ) : (
-        <h2>Welcome to Pro Contracts / Retailability Central Stores</h2>
+        <h2>Welcome to Pro Contracts</h2>
       )}
 
       <div className="ml-auto">

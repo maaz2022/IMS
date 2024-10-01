@@ -41,7 +41,7 @@ export const loginSignup = async (formData: FormData, isLogin: boolean) => {
 
 // update user
 
-export const updateUser = async (id: string, userId: string, isAdmin: boolean, status: string) => {
+export const updateUser = async (id: string, userId: string, isAdmin: boolean) => {
   let inventory;
   let trackOrder = null;
 
@@ -60,7 +60,6 @@ export const updateUser = async (id: string, userId: string, isAdmin: boolean, s
     trackOrder = await db.trackOrder.update({
       where: { id },
       data: {
-        status, // Dynamic status provided by the user
         orderCost: inventory.cost, // Set order cost from inventory
         itemName: inventory.name, // Set item name from inventory
         userName: inventory.userId
@@ -164,6 +163,9 @@ export const addUpdateInventory = async (formData: FormData, data: any) => {
   const getRequired = formData.get("required") as string;
   const getProInStore = formData.get("proInStore") as string;
 
+  // Get the Base64 image from formData
+  const imageBase64 = formData.get("imageBase64") as string | null;
+
   // Convert new fields to numbers
   const asPerPlan = Number(getAsPerPlan);
   const existing = Number(getExisting);
@@ -175,12 +177,24 @@ export const addUpdateInventory = async (formData: FormData, data: any) => {
   });
 
   // Validate that all required fields are present
-  if (!name || !description || !cost ) {
+  if (!name || !description || !cost) {
     return { error: "All fields are required" };
   }
 
   let inventory;
   try {
+    console.log("Creating/Updating Inventory:", {
+      name,
+      description,
+      cost,
+      asPerPlan,
+      existing,
+      required,
+      proInStore,
+      userId: user?.id,
+      image: imageBase64,
+    });
+
     if (data?.id) {
       // Update existing inventory
       inventory = await db.inventory.update({
@@ -194,6 +208,7 @@ export const addUpdateInventory = async (formData: FormData, data: any) => {
           required,
           proInStore,
           userId: user?.id,
+          image: imageBase64, // Store image as Base64
         },
       });
     } else {
@@ -208,20 +223,23 @@ export const addUpdateInventory = async (formData: FormData, data: any) => {
           required,
           proInStore,
           userId: user?.id,
+          image: imageBase64, // Store image as Base64
         },
       });
     }
 
     if (!inventory) {
-      return { error: "failed to create inventory" };
+      return { error: "Failed to create inventory" };
     }
   } catch (error) {
-    return { error: "failed to create inventory" };
+    console.error("Error in addUpdateInventory:", error);
+    return { error: "Failed to create inventory" };
   }
 
   revalidatePath(`/dashboard`);
   return inventory;
 };
+
 
 
 // delete inventory

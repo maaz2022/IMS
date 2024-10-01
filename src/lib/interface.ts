@@ -26,6 +26,7 @@ export type InventoryDataProps = {
   required: number;       
   proInStore: number;     
   itemsShort: number;  
+  image?: string;
 }[];
 interface Order {
   itemName: string;

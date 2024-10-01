@@ -47,6 +47,19 @@ import {
 import { signOut } from "next-auth/react";
 import InventoryData from "./InventoryData";
 import InventoryUpdate from "./InventoryUpdate";
+import Image from "next/image";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
 
 // Define your columns including new fields (asPerPlan, existing, required, proInStore, itemsShort)
 export const columns: ColumnDef<InventoryDataProps>[] = [
@@ -87,7 +100,6 @@ export const columns: ColumnDef<InventoryDataProps>[] = [
     },
     cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
   },
-
   {
     accessorKey: "description",
     header: "Description",
@@ -100,13 +112,10 @@ export const columns: ColumnDef<InventoryDataProps>[] = [
     header: () => <div className="text-right">Cost</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("cost"));
-
-      // Format the amount as a dollar amount
       const formatted = new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",
       }).format(amount);
-
       return <div className="text-right font-medium">{formatted}</div>;
     },
   },
@@ -130,20 +139,59 @@ export const columns: ColumnDef<InventoryDataProps>[] = [
     header: "Pro/In Store",
     cell: ({ row }) => row.getValue("proInStore"),
   },
-{
-  id: "itemsShort",
-  header: "Items Short",
-  cell: ({ row }) => {
-    // Ensure the values are numbers by casting them
-    const asPerPlan = Number(row.getValue("asPerPlan"));
-    const proInStore = Number(row.getValue("proInStore"));
-
-    // Safeguard in case the values are NaN (e.g., if they aren't valid numbers)
-    const itemsShort = !isNaN(asPerPlan) && !isNaN(proInStore) ? asPerPlan - proInStore : "Invalid data";
-
-    return itemsShort;
+  {
+    id: "itemsShort",
+    header: "Items Short",
+    cell: ({ row }) => {
+      const asPerPlan = Number(row.getValue("asPerPlan"));
+      const proInStore = Number(row.getValue("proInStore"));
+      const itemsShort =
+        !isNaN(asPerPlan) && !isNaN(proInStore)
+          ? asPerPlan - proInStore
+          : "Invalid data";
+      return itemsShort;
+    },
   },
+  {
+    accessorKey: "image",
+    header: "Image",
+    cell: ({ row }) => {
+      const imageUrl = row.getValue("image") as string; // Cast to string
+      const [isOpen, setIsOpen] = useState(false);
+      return (
+        <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+  <AlertDialogTrigger onClick={() => setIsOpen(true)}>
+    <Image
+      src={imageUrl || "/placeholder.png"} // Provide a placeholder if no image
+      alt={row.getValue("name")} // Use the name as alt text for accessibility
+      width={100}
+      height={100}
+      className="object-contain" // Adjust the size as needed
+    />
+  </AlertDialogTrigger>
+  <AlertDialogContent className="w-full h-64 sm:h-72 md:h-80 lg:h-96">
+    {/* Close Button */}
+    <button
+      className="absolute top-2 right-2 bg-gray-200 p-2 rounded-full text-gray-600 hover:bg-gray-300 focus:outline-none"
+      onClick={() => setIsOpen(false)} // Close the dialog
+    >
+      ✕ {/* Close Icon */}
+    </button>
+    <div className="relative w-full h-full flex items-center justify-center">
+      <Image
+        src={imageUrl || "/placeholder.png"} // Provide a placeholder if no image
+        alt={row.getValue("name")} // Use the name as alt text for accessibility
+        className="object-contain rounded-lg" // Adjust the size as needed
+        fill
+      />
+    </div>
+  </AlertDialogContent>
+</AlertDialog>
+
+      );
+    },
   },
+
   {
     accessorKey: "assignAction",
     header: "Transaction Status",
@@ -155,7 +203,6 @@ export const columns: ColumnDef<InventoryDataProps>[] = [
 
       const handleChange = async (userId: string) => {
         const res: any = await updateUser(task?.id, userId, true);
-
         if (res?.error) {
           toast({ title: res?.error });
         } else {
@@ -281,69 +328,45 @@ const DashboardDataTable = ({ data }: any) => {
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder ? null : (
+                          <div className="flex items-center">
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                            <div>
+                              {header.column.getIsSorted() === "asc" && (
+                                <ArrowUpDown className="h-4 w-4" />
                               )}
-                        </TableHead>
-                      );
-                    })}
+                              {header.column.getIsSorted() === "desc" && (
+                                <ArrowUpDown className="h-4 w-4" />
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </TableHead>
+                    ))}
                   </TableRow>
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
                   </TableRow>
-                )}
+                ))}
               </TableBody>
             </Table>
           </div>
-        </div>
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
         </div>
       </div>
     </div>
