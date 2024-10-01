@@ -66,7 +66,6 @@ export const updateUser = async (id: string, userId: string, isAdmin: boolean) =
     // Update the status and other order details in TrackOrder
     trackOrder = await db.trackOrder.create({
       data: {
-        status: "Pending", // Default status
         orderCost: inventory.cost, // Assuming the cost is part of the inventory
         itemName: inventory.name, // Get the item name from inventory
         userName: inventory.userId 
