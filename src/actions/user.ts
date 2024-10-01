@@ -71,7 +71,7 @@ export const updateUser = async (id: string, userId: string, isAdmin: boolean) =
         userName: inventory.userId 
           ? (await db.user.findUnique({ where: { id: inventory.userId } }))?.name || "" // Optional chaining to handle null
           : "", // Default to empty string if userId is null
-        userId: userId, // Associate with the user transferring the data
+        userId: userId, 
       },
     });
 
