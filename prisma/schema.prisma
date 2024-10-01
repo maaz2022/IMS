@@ -39,7 +39,6 @@ model Inventory {
 
 model TrackOrder {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  status    String // Order status (e.g., 'Pending', 'Shipped')
   orderCost Int // Cost of the order
   itemName  String // Name of the item
   userName  String // Name of the user

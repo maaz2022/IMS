@@ -267,7 +267,7 @@ const DashboardDataTable = ({ data }: any) => {
 
   return (
     <div>
-      <div className="flex justify-between w-full h-14 lg:h-16 items-center gap-4 border-b bg-gray-100/40 px-6">
+      <div className="flex justify-between w-full h-14 lg:h-16 items-center gap-4 border-b bg-gray-100/40  px-6">
         <div className="flex items-center gap-3 w-full">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
@@ -323,9 +323,9 @@ const DashboardDataTable = ({ data }: any) => {
           <InventoryData title="Add Inventory" data={{}} />
         </div>
         <div>
-          <div className="rounded-md border">
+          <div className="rounded-md border ">
             <Table>
-              <TableHeader>
+              <TableHeader className="bg-gray-200">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (

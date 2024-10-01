@@ -31,7 +31,7 @@ export type InventoryDataProps = {
 interface Order {
   itemName: string;
   deliveredTo: string;
-  status: string;
+  // status: string;
   destination: string; // New field added
   orderCost: number;   // New field added
     createdAt: Date;

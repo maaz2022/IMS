@@ -10,6 +10,11 @@ export const loginSignup = async (formData: FormData, isLogin: boolean) => {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
+  // Check if all required fields are filled
+  if (!email || !password || (!isLogin && !name)) {
+    return { error: "All fields are mandatory to filled." }; // Error message for missing fields
+  }
+
   const user = await db.user.findUnique({
     where: { email },
     select: { isAdmin: true },
@@ -24,20 +29,21 @@ export const loginSignup = async (formData: FormData, isLogin: boolean) => {
     callbackUrl: "/",
   })
     .then(() => {
-      redirect("/");
+      redirect("/"); // Redirect on successful sign in
     })
     .catch((err) => {
-      if (err?.toString() == "Error: NEXT_REDIRECT") {
+      if (err?.toString() === "Error: NEXT_REDIRECT") {
         user?.isAdmin ? redirect("/dashboard") : redirect("/");
-      } else return { error: err?.type };
+      } else return { error: err?.type }; // Return error type for failed login
     });
 
   if (!isLogin && res?.error) {
-    return { error: "credentials already exists" };
+    return { error: "credentials already exist" }; // Error for existing credentials
   } else {
-    return { error: "wrong credentials" };
+    return { error: "wrong credentials" }; // Error for wrong credentials
   }
 };
+
 
 // update user
 
@@ -49,27 +55,29 @@ export const updateUser = async (id: string, userId: string, isAdmin: boolean) =
     // Update inventory to assign the new userId
     inventory = await db.inventory.update({
       where: { id },
-      data: { userId }, // Transfer item ownership by updating userId
+      data: { userId },
     });
 
     if (!inventory) {
+      console.error("Inventory update failed: No inventory found");
       return { error: "failed to transfer inventory" };
     }
 
     // Update the status and other order details in TrackOrder
-    trackOrder = await db.trackOrder.update({
-      where: { id },
+    trackOrder = await db.trackOrder.create({
       data: {
-        orderCost: inventory.cost, // Set order cost from inventory
-        itemName: inventory.name, // Set item name from inventory
-        userName: inventory.userId
-          ? (await db.user.findUnique({ where: { id: inventory.userId } }))?.name || ""
-          : "", // Set the user's name if available
-        userId, // Set the userId as the current user transferring
+        status: "Pending", // Default status
+        orderCost: inventory.cost, // Assuming the cost is part of the inventory
+        itemName: inventory.name, // Get the item name from inventory
+        userName: inventory.userId 
+          ? (await db.user.findUnique({ where: { id: inventory.userId } }))?.name || "" // Optional chaining to handle null
+          : "", // Default to empty string if userId is null
+        userId: userId, // Associate with the user transferring the data
       },
     });
 
     if (!trackOrder) {
+      console.error("TrackOrder update failed: No track order found");
       return { error: "failed to update track order" };
     }
 
@@ -77,12 +85,13 @@ export const updateUser = async (id: string, userId: string, isAdmin: boolean) =
     revalidatePath(isAdmin ? "/dashboard" : "/");
 
   } catch (error) {
-    console.error("Error updating order:", error);
+    console.error("Error updating order:", error instanceof Error ? error.message : error);
     return { error: "failed to update the user and inventory" };
   }
 
   return { inventory, trackOrder };
 };
+
 
 
 

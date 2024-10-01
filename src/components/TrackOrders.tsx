@@ -32,7 +32,7 @@ interface Order {
   id: string; // Unique identifier
   itemName: string;
   name: string; // Changed from deliveredTo to name
-  status: string;
+  // status: string;
   orderCost: number; // New field added
 }
 
@@ -80,11 +80,11 @@ export const columns: ColumnDef<Order>[] = [
       <div className="lowercase line-clamp-2">{row.getValue("name")}</div>
     ),
   },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => <StatusDropdown row={row} />,
-  },
+  // {
+  //   accessorKey: "status",
+  //   header: "Status",
+  //   cell: ({ row }) => <StatusDropdown row={row} />,
+  // },
   {
     accessorKey: "orderCost",
     header: "Order Cost",
@@ -108,42 +108,42 @@ const DeleteButton = ({ row }: { row: any }) => {
   );
 };
 
-const StatusDropdown = ({ row }: { row: any }) => {
-  const [status, setStatus] = React.useState(row.getValue("status"));
+// const StatusDropdown = ({ row }: { row: any }) => {
+//   const [status, setStatus] = React.useState(row.getValue("status"));
 
-  const handleChange = async (newStatus: string) => {
-    setStatus(newStatus); // Optimistic UI update
+//   const handleChange = async (newStatus: string) => {
+//     setStatus(newStatus); // Optimistic UI update
 
-    const response = await updateUser(row.getValue("id"), row.getValue("userId"), true /*isAdmin*/, newStatus);
+//     const response = await updateUser(row.getValue("id"), row.getValue("userId"), true /*isAdmin*/, newStatus);
     
-    if (response.error) {
-      console.error("Error updating status:", response.error);
-      setStatus(row.getValue("status")); // Rollback UI if the update fails
-    }
-  };
+//     if (response.error) {
+//       console.error("Error updating status:", response.error);
+//       setStatus(row.getValue("status")); // Rollback UI if the update fails
+//     }
+//   };
 
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="ml-auto">
-          {status} <ChevronDown className="ml-2 h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {["Pending", "Processing", "Completed", "Canceled"].map((stat) => (
-          <DropdownMenuCheckboxItem
-            key={stat}
-            className="capitalize"
-            checked={status === stat}
-            onCheckedChange={() => handleChange(stat)}
-          >
-            {stat}
-          </DropdownMenuCheckboxItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
+  // return (
+  //   <DropdownMenu>
+  //     <DropdownMenuTrigger asChild>
+  //       <Button variant="outline" className="ml-auto">
+  //         {status} <ChevronDown className="ml-2 h-4 w-4" />
+  //       </Button>
+  //     </DropdownMenuTrigger>
+  //     {/* <DropdownMenuContent align="end">
+  //       {["Pending", "Processing", "Completed", "Canceled"].map((stat) => (
+  //         <DropdownMenuCheckboxItem
+  //           key={stat}
+  //           className="capitalize"
+  //           checked={status === stat}
+  //           onCheckedChange={() => handleChange(stat)}
+  //         >
+  //           {stat}
+  //         </DropdownMenuCheckboxItem>
+  //       ))}
+  //     </DropdownMenuContent> */}
+  //   </DropdownMenu>
+  // );
+
 
 // Main OrderTracking component
 const OrderTracking = ({ data = [] }: { data: Order[] }) => {
@@ -198,7 +198,7 @@ const OrderTracking = ({ data = [] }: { data: Order[] }) => {
       <div className="p-6">
         <div className="rounded-md border">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-gray-200">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (

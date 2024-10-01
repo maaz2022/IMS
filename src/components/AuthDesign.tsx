@@ -1,12 +1,24 @@
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
 const AuthDesign = () => {
   return (
-    <div className="flex justify-center items-center min-h-[90vh] bg-gray-50">
+    <div className="flex justify-center items-center min-h-[90vh] bg-gray-300 flex-col">
+              <div className=" justify-center mb-10">
+        <Image
+                src='/logo.jpeg'
+                alt="logo"
+                height={100}
+                width={100}
+                className="rounded-full"
+              />
+        </div>
       <div className="flex flex-col items-center justify-center py-12 px-6 sm:px-10 text-gray-800 w-full max-w-md bg-white shadow-xl rounded-xl transition-all duration-300 ease-in-out transform hover:scale-105">
         <h2 className="text-2xl font-bold text-center mb-6">
        Pro Contracts 
+
+       
         </h2>
         <div className="w-full">
           <h3 className="text-lg font-bold text-center mb-2">

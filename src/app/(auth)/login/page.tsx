@@ -4,6 +4,7 @@ import FormInput from "@/components/FormInput";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
+import Image from "next/image";
 import Link from "next/link";
 import React, { useOptimistic } from "react";
 
@@ -19,7 +20,16 @@ const Login = () => {
     setLoading(false);
   };
   return (
-    <div className="grid place-content-center min-h-screen bg-gray-100">
+    <div className="grid place-content-center min-h-screen bg-gray-300">
+        <div className="flex justify-center mb-10">
+        <Image
+                src='/logo.jpeg'
+                alt="logo"
+                height={100}
+                width={100}
+                className="rounded-full"
+              />
+        </div>
       <div className="flex flex-col justify-center gap-5 items-center py-10 w-[450px] shadow-lg rounded-lg bg-white">
         <h1 className="text-center font-bold text-4xl">Login</h1>
         <form action={handleSubmit} className="w-full px-5">

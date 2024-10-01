@@ -29,7 +29,6 @@ import {
 export type Payment = {
   id: string;
   amount: number;
-  status: "pending" | "processing" | "success" | "failed";
   email: string;
   name: string; // Assuming you want to include name
   description: string; // Assuming you want to include description
@@ -111,38 +110,38 @@ export const columns: ColumnDef<Payment>[] = [
       return <div className="text-right font-medium">{formatted}</div>;
     },
   },
-  {
-    id: "status",
-    header: "Order Status",
-    cell: ({ row }) => {
-      const [status, setStatus] = React.useState<Payment["status"]>(row.getValue("status")); // Initialize status with current value
-      const statusColor: Record<Payment["status"], string> = { // Define a mapping for status colors
-        pending: "text-yellow-500",
-        processing: "text-blue-500",
-        success: "text-green-500",
-        failed: "text-red-500",
-      };
+  // {
+  //   id: "status",
+  //   header: "Order Status",
+  //   cell: ({ row }) => {
+  //     const [status, setStatus] = React.useState<Payment["status"]>(row.getValue("status")); // Initialize status with current value
+  //     const statusColor: Record<Payment["status"], string> = { // Define a mapping for status colors
+  //       pending: "text-yellow-500",
+  //       processing: "text-blue-500",
+  //       success: "text-green-500",
+  //       failed: "text-red-500",
+  //     };
 
-      return (
-        <div>
-          <select
-            value={status}
-            onChange={(e) => {
-              const newStatus = e.target.value as Payment["status"];
-              setStatus(newStatus);
-              row.original.status = newStatus; // Update the status in the row's original data
-            }}
-            className={`border rounded p-1 ${statusColor[status]}`}
-          >
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="success">Success</option>
-            <option value="failed">Failed</option>
-          </select>
-        </div>
-      );
-    },
-  },
+  //     return (
+  //       <div>
+  //         <select
+  //           value={status}
+  //           onChange={(e) => {
+  //             const newStatus = e.target.value as Payment["status"];
+  //             setStatus(newStatus);
+  //             row.original.status = newStatus; // Update the status in the row's original data
+  //           }}
+  //           className={`border rounded p-1 ${statusColor[status]}`}
+  //         >
+  //           <option value="pending">Pending</option>
+  //           <option value="processing">Processing</option>
+  //           <option value="success">Success</option>
+  //           <option value="failed">Failed</option>
+  //         </select>
+  //       </div>
+  //     );
+  //   },
+  // },
 ];
 
 const ClientInventory = ({ user }: any) => {
@@ -179,7 +178,7 @@ const ClientInventory = ({ user }: any) => {
         <div>
           <div className="rounded-md border">
             <Table>
-              <TableHeader>
+              <TableHeader className="bg-gray-200">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => {
