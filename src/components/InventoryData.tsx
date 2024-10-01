@@ -59,7 +59,7 @@ const InventoryData = ({ title, data }: Props) => {
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
           <SheetDescription>
-            Update your inventory details below. Fill out all fields and click "Save" to submit.
+            Update your inventory details below. Fill out all fields and click &quotSave&quot to submit.
           </SheetDescription>
         </SheetHeader>
         <div className="w-full max-w-7xl border border-gray-200 rounded-lg p-6 bg-white shadow-md">
