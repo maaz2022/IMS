@@ -108,42 +108,6 @@ const DeleteButton = ({ row }: { row: any }) => {
   );
 };
 
-// const StatusDropdown = ({ row }: { row: any }) => {
-//   const [status, setStatus] = React.useState(row.getValue("status"));
-
-//   const handleChange = async (newStatus: string) => {
-//     setStatus(newStatus); // Optimistic UI update
-
-//     const response = await updateUser(row.getValue("id"), row.getValue("userId"), true /*isAdmin*/, newStatus);
-    
-//     if (response.error) {
-//       console.error("Error updating status:", response.error);
-//       setStatus(row.getValue("status")); // Rollback UI if the update fails
-//     }
-//   };
-
-  // return (
-  //   <DropdownMenu>
-  //     <DropdownMenuTrigger asChild>
-  //       <Button variant="outline" className="ml-auto">
-  //         {status} <ChevronDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     </DropdownMenuTrigger>
-  //     {/* <DropdownMenuContent align="end">
-  //       {["Pending", "Processing", "Completed", "Canceled"].map((stat) => (
-  //         <DropdownMenuCheckboxItem
-  //           key={stat}
-  //           className="capitalize"
-  //           checked={status === stat}
-  //           onCheckedChange={() => handleChange(stat)}
-  //         >
-  //           {stat}
-  //         </DropdownMenuCheckboxItem>
-  //       ))}
-  //     </DropdownMenuContent> */}
-  //   </DropdownMenu>
-  // );
-
 
 // Main OrderTracking component
 const OrderTracking = ({ data = [] }: { data: Order[] }) => {

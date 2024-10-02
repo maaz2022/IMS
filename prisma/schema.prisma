@@ -18,6 +18,7 @@ model User {
 
   Inventory   Inventory[]
   TrackOrders TrackOrder[] // Relation to TrackOrder
+  Transmittal Transmittal[]
 }
 
 model Inventory {
@@ -34,7 +35,7 @@ model Inventory {
   itemsShort  Int?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
-  image       String? 
+  image       String?
 }
 
 model TrackOrder {
@@ -47,20 +48,22 @@ model TrackOrder {
   createdAt DateTime? @default(now()) // Creation time of the order
   updatedAt DateTime? @updatedAt // Last updated time of the order
 }
+
 model Transmittal {
-  id                       String       @id @default(auto()) @map("_id") @db.ObjectId
-  mall                     String
-  storeCollectedFrom        String
-  storeDeliveredTo          String
-  managerName               String
-  descriptionOfGoods        String
-  quantity                  Int
-  dateDispatched            DateTime
-  dateReceived              DateTime
-  time                      String
+  id                         String   @id @default(auto()) @map("_id") @db.ObjectId
+  mall                       String
+  storeCollectedFrom         String
+  storeDeliveredTo           String
+  managerName                String
+  descriptionOfGoods         String
+  quantity                   Int
+  dateDispatched             DateTime
+  dateReceived               DateTime
+  time                       String
   receivingStoreRepName      String
   receivingStoreRepSignature String
-  
-  createdAt                 DateTime  @default(now())
-  updatedAt                 DateTime  @updatedAt
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+  userId                     String?  @db.ObjectId
+  user                       User?    @relation(fields: [userId], references: [id])
 }

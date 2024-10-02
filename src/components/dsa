@@ -1,0 +1,65 @@
+export const columns: ColumnDef<TransmittalDataProps>[] = [
+  {
+    accessorKey: "mall",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Mall
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => <div>{row.getValue("mall")}</div>,
+  },
+  {
+    accessorKey: "storeCollectedFrom",
+    header: "Store Collected From",
+    cell: ({ row }) => <div>{row.getValue("storeCollectedFrom")}</div>,
+  },
+  {
+    accessorKey: "storeDeliveredTo",
+    header: "Store Delivered To",
+    cell: ({ row }) => <div>{row.getValue("storeDeliveredTo")}</div>,
+  },
+  {
+    accessorKey: "managerName",
+    header: "Manager Name",
+    cell: ({ row }) => <div>{row.getValue("managerName")}</div>,
+  },
+  {
+    accessorKey: "descriptionOfGoods",
+    header: "Description of Goods",
+    cell: ({ row }) => <div>{row.getValue("descriptionOfGoods")}</div>,
+  },
+  {
+    accessorKey: "quantity",
+    header: "Quantity",
+    cell: ({ row }) => <div>{row.getValue("quantity")}</div>,
+  },
+  {
+    accessorKey: "dateDispatched",
+    header: "Date Dispatched",
+    cell: ({ row }) => <div>{row.getValue("dateDispatched")}</div>,
+  },
+  {
+    accessorKey: "dateReceived",
+    header: "Date Received",
+    cell: ({ row }) => <div>{row.getValue("dateReceived")}</div>,
+  },
+  {
+    accessorKey: "time",
+    header: "Time",
+    cell: ({ row }) => <div>{row.getValue("time")}</div>,
+  },
+  {
+    accessorKey: "receivingStoreRepName",
+    header: "Receiving Store Rep Name",
+    cell: ({ row }) => <div>{row.getValue("receivingStoreRepName")}</div>,
+  },
+  {
+    accessorKey: "receivingStoreRepSignature",
+    header: "Receiving Store Rep Signature",
+    cell: ({ row }) => <div>{row.getValue("receivingStoreRepSignature")}</div>,
+  },
+];

@@ -36,7 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { updateUser } from "@/actions/user";
+
 import { toast } from "./ui/use-toast";
 import {
   DropdownMenu,
@@ -61,6 +61,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
 import { ImageCell } from "./ImageCell";
+import { updateUser } from "@/actions/user";
+
 
 
 // Define your columns including new fields (asPerPlan, existing, required, proInStore, itemsShort)

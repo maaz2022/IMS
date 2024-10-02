@@ -91,6 +91,54 @@ export const updateUser = async (id: string, userId: string, isAdmin: boolean) =
   return { inventory, trackOrder };
 };
 
+// export const updateUserr = async (id: string, userId: string, isAdmin: boolean) => {
+//   let transmittal;
+//   let trackOrder = null;
+
+//   try {
+//     // Update the transmittal to assign the new userId
+//     transmittal = await db.transmittal.update({
+//       where: { id },
+//       data: { userId }, // Update userId for the transmittal
+//     });
+
+//     if (!transmittal) {
+//       console.error("Transmittal update failed: No transmittal found");
+//       return { error: "Failed to transfer transmittal" };
+//     }
+
+//     // Create a new track order based on the transmittal details
+// trackOrder = await db.trackOrder.create({
+//   data: {
+
+//     itemName: transmittal.descriptionOfGoods,
+//     userName: transmittal.userId
+//       ? (await db.user.findUnique({ where: { id: transmittal.userId } }))?.name || ""
+//       : "",
+//     userId: userId,
+//     mall: transmittal.mall, // Now this will be valid
+//     storeCollectedFrom: transmittal.storeCollectedFrom, // This too
+//     storeDeliveredTo: transmittal.storeDeliveredTo, // And this
+//     quantity: transmittal.quantity, // If you need to track quantity
+//   },
+// });
+
+
+//     if (!trackOrder) {
+//       console.error("TrackOrder creation failed: No track order found");
+//       return { error: "Failed to create track order" };
+//     }
+
+//     // Optionally revalidate the frontend view based on user's role (Admin or User)
+//     revalidatePath(isAdmin ? "/dashboard" : "/");
+
+//   } catch (error) {
+//     console.error("Error updating order:", error instanceof Error ? error.message : error);
+//     return { error: "Failed to update the user and transmittal" };
+//   }
+
+//   return { transmittal, trackOrder }; // Return both transmittal and track order details
+// };
 
 
 
@@ -292,6 +340,124 @@ export const DeleteTrackOrder = async (id: string) => {
   } catch (error) {
     return { error: "track order not deleted" };
   }
+};
+
+
+export const TransmittalDelete = async (id: string) => {
+  try {
+    const result = await db.transmittal.delete({
+      where: { id },
+    });
+    revalidatePath("/dashboard");
+    if (!result) {
+      return { error: "Transmittal not deleted" };
+    }
+  } catch (error) {
+    return { error: "transmittal not deleted" };
+  }
+};
+
+
+
+export const addUpdateTransmittal = async (formData: FormData, data: any) => {
+  const session = await auth();
+
+  // Retrieve fields from formData
+  const mall = formData.get("mall") as string;
+  const storeCollectedFrom = formData.get("storeCollectedFrom") as string;
+  const storeDeliveredTo = formData.get("storeDeliveredTo") as string;
+  const managerName = formData.get("managerName") as string;
+  const descriptionOfGoods = formData.get("descriptionOfGoods") as string;
+  const getQuantity = formData.get("quantity") as string;
+  const quantity = Number(getQuantity); // Convert to number directly
+
+  // Retrieve and format dates
+  const dateDispatched = formData.get("dateDispatched") as string;
+  const dateReceived = formData.get("dateReceived") as string;
+
+  const formattedDateDispatched = new Date(dateDispatched).toISOString();
+  const formattedDateReceived = new Date(dateReceived).toISOString();
+
+  const time = formData.get("time") as string;
+  const receivingStoreRepName = formData.get("receivingStoreRepName") as string;
+  const receivingStoreRepSignature = formData.get("receivingStoreRepSignature") as string;
+
+  // Fetch user details based on the session
+  const user = await db.user.findUnique({
+    where: { email: session?.user?.email! },
+  });
+
+  // Validate that all required fields are present
+  if (!mall || !storeCollectedFrom || !storeDeliveredTo || !managerName || !descriptionOfGoods || !quantity) {
+    return { error: "All required fields must be provided" };
+  }
+
+  let transmittal;
+  try {
+    console.log("Creating/Updating Transmittal:", {
+      mall,
+      storeCollectedFrom,
+      storeDeliveredTo,
+      managerName,
+      descriptionOfGoods,
+      quantity,
+      dateDispatched: formattedDateDispatched,
+      dateReceived: formattedDateReceived,
+      time,
+      receivingStoreRepName,
+      receivingStoreRepSignature,
+      userId: user?.id,
+    });
+
+    if (data?.id) {
+      // Update existing transmittal
+      transmittal = await db.transmittal.update({
+        where: { id: data.id },
+        data: {
+          mall,
+          storeCollectedFrom,
+          storeDeliveredTo,
+          managerName,
+          descriptionOfGoods,
+          quantity,
+          dateDispatched: formattedDateDispatched,
+          dateReceived: formattedDateReceived,
+          time,
+          receivingStoreRepName,
+          receivingStoreRepSignature,
+          userId: user?.id,
+        },
+      });
+    } else {
+      // Create new transmittal
+      transmittal = await db.transmittal.create({
+        data: {
+          mall,
+          storeCollectedFrom,
+          storeDeliveredTo,
+          managerName,
+          descriptionOfGoods,
+          quantity,
+          dateDispatched: formattedDateDispatched,
+          dateReceived: formattedDateReceived,
+          time,
+          receivingStoreRepName,
+          receivingStoreRepSignature,
+          userId: user?.id,
+        },
+      });
+    }
+
+    if (!transmittal) {
+      return { error: "Failed to create transmittal" };
+    }
+  } catch (error: any) {
+    console.error("Error in addUpdateTransmittal:", error);
+    return { error: error.message || "Failed to create transmittal" };
+  }
+
+  revalidatePath(`/dashboard`); // Revalidate path for client-side updates
+  return transmittal; // Return the created or updated transmittal
 };
 
 

@@ -1,210 +1,212 @@
-'use client'
+'use client';
+
 import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { toast } from "@/components/ui/use-toast";
+import { addUpdateTransmittal } from '@/actions/user';
 
-const AddTransmittalForm: React.FC = () => {
-  const [formData, setFormData] = useState({
-    mall: '',
-    storeCollectedFrom: '',
-    storeDeliveredTo: '',
-    managerName: '',
-    descriptionOfGoods: '',
-    quantity: '',
-    dateDispatched: '',
-    dateReceived: '',
-    time: '',
-    receivingStoreRepName: '',
-    receivingStoreRepSignature: '',
-  });
+// Define the structure for your form data
+interface TransmittalDataProps {
+  mall: string;
+  storeCollectedFrom: string;
+  storeDeliveredTo: string;
+  managerName: string;
+  descriptionOfGoods: string;
+  quantity: string;
+  dateDispatched: string;
+  dateReceived: string;
+  time: string;
+  receivingStoreRepName: string;
+  receivingStoreRepSignature: string;
+}
+type Props = {
+  title: string;
+  data: any; // Define this according to the expected data structure
+};
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+const AddTransmittalForm = ({ title, data }: Props) => {
+const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Logic to handle form submission goes here
-    console.log('Form data submitted:', formData);
+    const formData = new FormData(event.currentTarget);
+
+    const response: any = await addUpdateTransmittal(formData, data);
+
+    if (response?.error) {
+      toast({ title: response?.error });
+    } else {
+      toast({ title: "Transmittal updated successfully!" });
+    }
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <h2 className="text-2xl font-semibold mb-6 text-center">New Transmittal Form</h2>
-      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Mall Field */}
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="mall">
-              Mall
-            </label>
-            <input
-              type="text"
-              name="mall"
-              value={formData.mall}
-              onChange={handleChange}
-              placeholder="Enter mall name"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline">{title}</Button>
+      </SheetTrigger>
+      <SheetContent className="w-full space-y-8">
+        <SheetHeader>
+          <SheetTitle>{title}</SheetTitle>
+          <SheetDescription>
+            Please fill in all fields to add a new transmittal.
+          </SheetDescription>
+        </SheetHeader>
+        <div className="w-full max-w-7xl border border-gray-200 rounded-lg p-6 bg-white shadow-md">
+          <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-8">
+            {/* Left Column */}
+            <div className="col-span-1 space-y-4">
+              <div>
+                <Label htmlFor="mall">Mall</Label>
+                <Input
+                  type="text"
+                  name="mall"
+                  defaultValue={data?.mall}
+                  placeholder="Enter mall name"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="storeCollectedFrom">Store Collected From</Label>
+                <Input
+                  type="text"
+                  name="storeCollectedFrom"
+                  defaultValue={data?.storeCollectedFrom}
+               
+                  placeholder="Enter store collected from"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="storeDeliveredTo">Store Delivered To</Label>
+                <Input
+                  type="text"
+                  name="storeDeliveredTo"
+              
+                  defaultValue={data?.storeDeliveredTo}
+                  placeholder="Enter store delivered to"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="managerName">Manager Name</Label>
+                <Input
+                  type="text"
+                  name="managerName"
+                 defaultValue={data?.managerName}
+                  placeholder="Enter manager name"
+                  className="mt-2"
+                />
+              </div>
+            </div>
 
-          {/* Store Collected From */}
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="storeCollectedFrom">
-              Store Collected From
-            </label>
-            <input
-              type="text"
-              name="storeCollectedFrom"
-              value={formData.storeCollectedFrom}
-              onChange={handleChange}
-              placeholder="Enter store collected from"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
+            {/* Right Column */}
+            <div className="col-span-1 space-y-4">
+              <div>
+                <Label htmlFor="descriptionOfGoods">Description of Goods</Label>
+                <Input
+                  type="text"
+                  name="descriptionOfGoods"
+                 defaultValue={data?.descriptionOfGoods}
+            
+                  placeholder="Enter description of goods"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="quantity">Quantity</Label>
+                <Input
+                  type="number"
+                  name="quantity"
+                defaultValue={data?.quantity}
+               
+                  placeholder="Enter quantity"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="dateDispatched">Date Dispatched</Label>
+                <Input
+                  type="date"
+                  name="dateDispatched"
+                  defaultValue={data?.dateDispatched}
+              
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="dateReceived">Date Received</Label>
+                <Input
+                  type="date"
+                  name="dateReceived"
+                defaultValue={data?.dateReceived}
+           
+                  className="mt-2"
+                />
+              </div>
+            </div>
 
-          {/* Store Delivered To */}
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="storeDeliveredTo">
-              Store Delivered To
-            </label>
-            <input
-              type="text"
-              name="storeDeliveredTo"
-              value={formData.storeDeliveredTo}
-              onChange={handleChange}
-              placeholder="Enter store delivered to"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
+            {/* Extra Fields */}
+            <div className="col-span-1 space-y-4">
+              <div>
+                <Label htmlFor="time">Time</Label>
+                <Input
+                  type="time"
+                  name="time"
+                  defaultValue={data?.time}
+           
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="receivingStoreRepName">Receiving Store Rep Name</Label>
+                <Input
+                  type="text"
+                  name="receivingStoreRepName"
+                  defaultValue={data?.receivingStoreRepName}
+          
+                  placeholder="Enter representative name"
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="receivingStoreRepSignature">Receiving Store Rep Signature</Label>
+                <Input
+                  type="text"
+                  name="receivingStoreRepSignature"
+                  defaultValue={data?.receivingStoreRepSignature}
+                  placeholder="Enter signature"
+                  className="mt-2"
+                />
+              </div>
+            </div>
 
-          {/* Manager Name */}
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="managerName">
-              Manager Name
-            </label>
-            <input
-              type="text"
-              name="managerName"
-              value={formData.managerName}
-              onChange={handleChange}
-              placeholder="Enter manager name"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-
-          {/* Description of Goods */}
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="descriptionOfGoods">
-              Description of Goods
-            </label>
-            <input
-              type="text"
-              name="descriptionOfGoods"
-              value={formData.descriptionOfGoods}
-              onChange={handleChange}
-              placeholder="Enter description of goods"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-
-          {/* Quantity */}
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="quantity">
-              Quantity
-            </label>
-            <input
-              type="number"
-              name="quantity"
-              value={formData.quantity}
-              onChange={handleChange}
-              placeholder="Enter quantity"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-
-          {/* Date Dispatched */}
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="dateDispatched">
-              Date Dispatched
-            </label>
-            <input
-              type="date"
-              name="dateDispatched"
-              value={formData.dateDispatched}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-
-          {/* Date Received */}
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="dateReceived">
-              Date Received
-            </label>
-            <input
-              type="date"
-              name="dateReceived"
-              value={formData.dateReceived}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-
-          {/* Time */}
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="time">
-              Time
-            </label>
-            <input
-              type="time"
-              name="time"
-              value={formData.time}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-
-          {/* Receiving Store Rep Name */}
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="receivingStoreRepName">
-              Receiving Store Rep Name
-            </label>
-            <input
-              type="text"
-              name="receivingStoreRepName"
-              value={formData.receivingStoreRepName}
-              onChange={handleChange}
-              placeholder="Enter representative name"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-
-          {/* Receiving Store Rep Signature */}
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="receivingStoreRepSignature">
-              Receiving Store Rep Signature
-            </label>
-            <input
-              type="text"
-              name="receivingStoreRepSignature"
-              value={formData.receivingStoreRepSignature}
-              onChange={handleChange}
-              placeholder="Enter signature"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
+            {/* Footer */}
+            <SheetFooter className="col-span-2 flex justify-end pt-6">
+              <Button type="submit" className="mt-5">
+                Add Transmittal
+              </Button>
+              <SheetClose asChild>
+                <Button variant="outline" className="ml-2 mt-5">
+                  Cancel
+                </Button>
+              </SheetClose>
+            </SheetFooter>
+          </form>
         </div>
-
-        <div className="flex items-center justify-between mt-6">
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            Add New Transmittal
-          </button>
-        </div>
-      </form>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 

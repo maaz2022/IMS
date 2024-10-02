@@ -37,3 +37,16 @@ interface Order {
     createdAt: Date;
   updatedAt: Date | null;
 }
+export interface TransmittalDataProps {
+  mall: string;
+  storeCollectedFrom: string;
+  storeDeliveredTo: string;
+  managerName: string;
+  descriptionOfGoods: string;
+  quantity: number;
+  dateDispatched: string;
+  dateReceived: string;
+  time: string;
+  receivingStoreRepName: string;
+  receivingStoreRepSignature: string;
+}
