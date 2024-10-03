@@ -371,12 +371,20 @@ export const addUpdateTransmittal = async (formData: FormData, data: any) => {
   const getQuantity = formData.get("quantity") as string;
   const quantity = Number(getQuantity); // Convert to number directly
 
-  // Retrieve and format dates
+  // Retrieve and validate dates
   const dateDispatched = formData.get("dateDispatched") as string;
   const dateReceived = formData.get("dateReceived") as string;
 
-  const formattedDateDispatched = new Date(dateDispatched).toISOString();
-  const formattedDateReceived = new Date(dateReceived).toISOString();
+  let formattedDateDispatched = "";
+  let formattedDateReceived = "";
+
+  if (dateDispatched) {
+    formattedDateDispatched = new Date(dateDispatched).toISOString();
+  }
+
+  if (dateReceived) {
+    formattedDateReceived = new Date(dateReceived).toISOString();
+  }
 
   const time = formData.get("time") as string;
   const receivingStoreRepName = formData.get("receivingStoreRepName") as string;
@@ -388,7 +396,19 @@ export const addUpdateTransmittal = async (formData: FormData, data: any) => {
   });
 
   // Validate that all required fields are present
-  if (!mall || !storeCollectedFrom || !storeDeliveredTo || !managerName || !descriptionOfGoods || !quantity) {
+  if (
+    !mall ||
+    !storeCollectedFrom ||
+    !storeDeliveredTo ||
+    !managerName ||
+    !descriptionOfGoods ||
+    !quantity ||
+    !dateDispatched ||
+    !dateReceived ||
+    !time ||
+    !receivingStoreRepName ||
+    !receivingStoreRepSignature
+  ) {
     return { error: "All required fields must be provided" };
   }
 
@@ -459,6 +479,7 @@ export const addUpdateTransmittal = async (formData: FormData, data: any) => {
   revalidatePath(`/dashboard`); // Revalidate path for client-side updates
   return transmittal; // Return the created or updated transmittal
 };
+
 
 
 
